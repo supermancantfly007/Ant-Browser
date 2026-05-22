@@ -144,11 +144,11 @@ export function BrowserListPage() {
   const [coreValidation, setCoreValidation] = useState<{ valid: boolean; message: string } | null>(null)
   const [savingCore, setSavingCore] = useState(false)
 
-  // 扩容管理
+  // 容量状态
   const [expandModalOpen, setExpandModalOpen] = useState(false)
   const [cdKey, setCdKey] = useState('')
   const [redeeming, setRedeeming] = useState(false)
-  const [maxProfileLimit, setMaxProfileLimit] = useState(20)
+  const [maxProfileLimit, setMaxProfileLimit] = useState(0)
 
   const updatePendingIds = (
     setter: React.Dispatch<React.SetStateAction<Set<string>>>,
@@ -244,7 +244,7 @@ export function BrowserListPage() {
     try {
       await reloadConfig()
       const stats = await fetchDashboardStats()
-      setMaxProfileLimit(stats.maxProfileLimit || 20)
+      setMaxProfileLimit(stats.maxProfileLimit ?? 0)
     } catch {
       // ignore
     }

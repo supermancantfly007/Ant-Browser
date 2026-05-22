@@ -42,7 +42,7 @@ export function DashboardPage() {
     proxyCount: 0,
     coreCount: 0,
     memUsedMB: 0,
-    maxProfileLimit: 20,
+    maxProfileLimit: 0,
     appVersion: 'unknown',
   })
   const [loading, setLoading] = useState(true)
@@ -96,6 +96,7 @@ export function DashboardPage() {
   }
 
   const v = (n: number) => loading ? '-' : n.toString()
+  const hasProfileLimit = stats.maxProfileLimit > 0
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -177,44 +178,52 @@ export function DashboardPage() {
           </div>
 
           <div className="mt-6 pt-6 border-t border-[var(--color-border-muted)]">
-            <h3 className="text-sm font-medium text-[var(--color-text-primary)] mb-3">扩容系统</h3>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                placeholder="输入兑换码 (如 ANT-...)"
-                value={cdKey}
-                onChange={e => setCdKey(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleRedeem()}
-                className="flex-1 px-3 py-2 text-sm rounded-lg border border-[var(--color-border-default)]
-                           bg-[var(--color-bg-input)] text-[var(--color-text-primary)]
-                           focus:outline-none focus:border-[var(--color-primary)] placeholder-[var(--color-text-muted)]"
-              />
-              <Button onClick={handleRedeem} loading={redeeming} disabled={!cdKey.trim()}>
-                兑换
-              </Button>
-            </div>
+            <h3 className="text-sm font-medium text-[var(--color-text-primary)] mb-3">实例容量</h3>
+            {hasProfileLimit && (
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="输入兑换码 (如 ANT-...)"
+                  value={cdKey}
+                  onChange={e => setCdKey(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleRedeem()}
+                  className="flex-1 px-3 py-2 text-sm rounded-lg border border-[var(--color-border-default)]
+                             bg-[var(--color-bg-input)] text-[var(--color-text-primary)]
+                             focus:outline-none focus:border-[var(--color-primary)] placeholder-[var(--color-text-muted)]"
+                />
+                <Button onClick={handleRedeem} loading={redeeming} disabled={!cdKey.trim()}>
+                  兑换
+                </Button>
+              </div>
+            )}
             <p className="mt-2 text-xs text-[var(--color-text-muted)] flex items-center justify-between">
-              <span>当前容量限制：</span>
-              <span className={`font-medium ${stats.totalInstances >= stats.maxProfileLimit ? 'text-red-500' : 'text-[var(--color-success)]'}`}>
-                {loading ? '-' : `${stats.totalInstances} / ${stats.maxProfileLimit}`}
+              <span>当前实例容量：</span>
+              <span className={`font-medium ${hasProfileLimit && stats.totalInstances >= stats.maxProfileLimit ? 'text-red-500' : 'text-[var(--color-success)]'}`}>
+                {loading ? '-' : hasProfileLimit ? `${stats.totalInstances} / ${stats.maxProfileLimit}` : `${stats.totalInstances} / 无限制`}
               </span>
             </p>
 
-            <div className="mt-4 rounded-lg border border-blue-500/20 bg-blue-500/10 p-4">
-              <div className="flex items-center justify-between gap-4">
-                <p className="text-sm text-[var(--color-text-primary)]">点亮 GitHub Star 后，可再获赠 50 个永久额度</p>
-                <button
-                  type="button"
-                  className="shrink-0 rounded-full p-2 text-[var(--color-accent)] transition-colors hover:bg-[var(--color-accent)]/10 disabled:opacity-50"
-                  onClick={handleOpenGithubStarGift}
-                  disabled={redeeming}
-                  title="打开 GitHub 并领取赠送"
-                  aria-label="打开 GitHub 并领取赠送"
-                >
-                  <ExternalLink className="w-4 h-4" />
-                </button>
+            {hasProfileLimit ? (
+              <div className="mt-4 rounded-lg border border-blue-500/20 bg-blue-500/10 p-4">
+                <div className="flex items-center justify-between gap-4">
+                  <p className="text-sm text-[var(--color-text-primary)]">点亮 GitHub Star 后，可再获赠 50 个永久额度</p>
+                  <button
+                    type="button"
+                    className="shrink-0 rounded-full p-2 text-[var(--color-accent)] transition-colors hover:bg-[var(--color-accent)]/10 disabled:opacity-50"
+                    onClick={handleOpenGithubStarGift}
+                    disabled={redeeming}
+                    title="打开 GitHub 并领取赠送"
+                    aria-label="打开 GitHub 并领取赠送"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="mt-4 rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-secondary)] p-4">
+                <p className="text-sm text-[var(--color-text-primary)]">当前版本已取消实例数量限制，无需兑换码扩容。</p>
+              </div>
+            )}
           </div>
         </Card>
       </div>

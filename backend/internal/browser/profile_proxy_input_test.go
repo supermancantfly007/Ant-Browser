@@ -70,6 +70,38 @@ func TestCreateProfileFallsBackToDirectWhenProxyInputEmpty(t *testing.T) {
 	}
 }
 
+func TestCreateAndCopyIgnoreConfiguredProfileLimit(t *testing.T) {
+	cfg := config.DefaultConfig()
+	cfg.App.MaxProfileLimit = 1
+	mgr := NewManager(cfg, t.TempDir())
+	mgr.Profiles["existing"] = &Profile{
+		ProfileId:   "existing",
+		ProfileName: "Existing",
+		UserDataDir: "existing",
+	}
+
+	created, err := mgr.Create(ProfileInput{
+		ProfileName: "Created after limit",
+	})
+	if err != nil {
+		t.Fatalf("create should ignore configured profile limit: %v", err)
+	}
+	if created == nil {
+		t.Fatalf("created profile is nil")
+	}
+
+	copied, err := mgr.Copy("existing", "Copied after limit")
+	if err != nil {
+		t.Fatalf("copy should ignore configured profile limit: %v", err)
+	}
+	if copied == nil {
+		t.Fatalf("copied profile is nil")
+	}
+	if len(mgr.Profiles) != 3 {
+		t.Fatalf("expected 3 profiles after create and copy, got=%d", len(mgr.Profiles))
+	}
+}
+
 func TestUpdateProfileRejectsMissingProxyIDWithoutProxyConfig(t *testing.T) {
 	mgr := newProfileProxyInputTestManager(t)
 	profile, err := mgr.Create(ProfileInput{

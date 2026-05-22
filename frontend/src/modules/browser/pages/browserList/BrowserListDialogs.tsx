@@ -61,6 +61,8 @@ export function BrowserListDialogs({
   opError,
   onCloseOpError,
 }: BrowserListDialogsProps) {
+  const hasProfileLimit = maxProfileLimit > 0
+
   return (
     <>
       <Modal
@@ -107,7 +109,7 @@ export function BrowserListDialogs({
       <Modal
         open={expandModalOpen}
         onClose={onCloseExpand}
-        title="实例扩容系统"
+        title="实例容量"
         width="480px"
         footer={<Button variant="secondary" onClick={onCloseExpand}>关闭</Button>}
       >
@@ -115,47 +117,59 @@ export function BrowserListDialogs({
           <div className="bg-[var(--color-bg-secondary)] p-4 rounded-lg flex items-center justify-between border border-[var(--color-border-default)]">
             <div>
               <p className="text-sm font-medium text-[var(--color-text-primary)]">当前使用情况</p>
-              <p className="text-xs text-[var(--color-text-muted)] mt-1">每个配置都需要消耗 1 个实例额度</p>
+              <p className="text-xs text-[var(--color-text-muted)] mt-1">
+                {hasProfileLimit ? '每个配置都需要消耗 1 个实例额度' : '当前版本不限制实例数量'}
+              </p>
             </div>
             <div className="text-right">
-              <span className={`text-2xl font-semibold ${profilesCount >= maxProfileLimit ? 'text-red-500' : 'text-[var(--color-success)]'}`}>
+              <span className={`text-2xl font-semibold ${hasProfileLimit && profilesCount >= maxProfileLimit ? 'text-red-500' : 'text-[var(--color-success)]'}`}>
                 {profilesCount}
               </span>
-              <span className="text-sm text-[var(--color-text-muted)] ml-1">/ {maxProfileLimit}</span>
+              <span className="text-sm text-[var(--color-text-muted)] ml-1">
+                / {hasProfileLimit ? maxProfileLimit : '无限制'}
+              </span>
             </div>
           </div>
 
-          <div className="pt-2 border-t border-[var(--color-border-muted)]">
-            <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">使用兑换码扩容</label>
-            <div className="flex gap-2">
-              <Input
-                value={cdKey}
-                onChange={e => onCdKeyChange(e.target.value)}
-                placeholder="输入兑换码 (如 ANT-...)"
-                onKeyDown={e => e.key === 'Enter' && onRedeem()}
-                className="flex-1"
-              />
-              <Button onClick={onRedeem} loading={redeeming} disabled={!cdKey.trim()}>
-                进行兑换
-              </Button>
-            </div>
-          </div>
+          {hasProfileLimit ? (
+            <>
+              <div className="pt-2 border-t border-[var(--color-border-muted)]">
+                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">使用兑换码扩容</label>
+                <div className="flex gap-2">
+                  <Input
+                    value={cdKey}
+                    onChange={e => onCdKeyChange(e.target.value)}
+                    placeholder="输入兑换码 (如 ANT-...)"
+                    onKeyDown={e => e.key === 'Enter' && onRedeem()}
+                    className="flex-1"
+                  />
+                  <Button onClick={onRedeem} loading={redeeming} disabled={!cdKey.trim()}>
+                    进行兑换
+                  </Button>
+                </div>
+              </div>
 
-          <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-            <div className="flex items-center justify-between gap-4">
-              <p className="text-sm text-[var(--color-text-primary)]">点亮 GitHub Star 后，可再获赠 50 个永久额度</p>
-              <button
-                type="button"
-                className="shrink-0 rounded-full p-2 text-[var(--color-accent)] transition-colors hover:bg-[var(--color-accent)]/10 disabled:opacity-50"
-                onClick={onOpenGithubStarGift}
-                disabled={redeeming}
-                title="打开 GitHub 并领取赠送"
-                aria-label="打开 GitHub 并领取赠送"
-              >
-                <ExternalLink className="w-4 h-4" />
-              </button>
+              <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                <div className="flex items-center justify-between gap-4">
+                  <p className="text-sm text-[var(--color-text-primary)]">点亮 GitHub Star 后，可再获赠 50 个永久额度</p>
+                  <button
+                    type="button"
+                    className="shrink-0 rounded-full p-2 text-[var(--color-accent)] transition-colors hover:bg-[var(--color-accent)]/10 disabled:opacity-50"
+                    onClick={onOpenGithubStarGift}
+                    disabled={redeeming}
+                    title="打开 GitHub 并领取赠送"
+                    aria-label="打开 GitHub 并领取赠送"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-secondary)] p-4">
+              <p className="text-sm text-[var(--color-text-primary)]">实例数量限制已取消，可以继续创建和复制实例，无需兑换码扩容。</p>
             </div>
-          </div>
+          )}
         </div>
       </Modal>
 

@@ -76,7 +76,7 @@ export function BrowserListHeader({
             onClick={onOpenExpandModal}
             className="text-[var(--color-primary)] border-[var(--color-primary)] hover:bg-[var(--color-primary)]/10"
           >
-            <Gift className="w-4 h-4" />扩容实例
+            <Gift className="w-4 h-4" />容量状态
           </Button>
           <div className="flex items-center bg-[var(--color-bg-secondary)] rounded-md border border-[var(--color-border-default)] p-0.5 ml-2">
             <button

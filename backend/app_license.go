@@ -29,7 +29,7 @@ func (a *App) GetLicenseStatus() LicenseStatus {
 	}
 
 	return LicenseStatus{
-		MaxLimit:  a.config.App.MaxProfileLimit,
+		MaxLimit:  0,
 		UsedCount: profilesCount,
 		UsedKeys:  usedKeys,
 	}
